@@ -1,0 +1,10 @@
+---
+# vars file for setup_woring_environment
+
+packages:
+  - tmux
+  - git
+  - curl
+  - wget
+  - sudo
+  - acl

@@ -1,0 +1,46 @@
+---
+# tasks file for setup_woring_environment
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_os_family }}.yml"
+    - "../vars/default.yml"
+
+- name: Update cache
+  become: true
+  ansible.builtin.package:
+    update_cache: true
+
+- name: Install packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ packages }}"
+
+- name: Create a login user
+  become: true
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    # password: "{{ user_pass }}"
+    groups: "{{ user_groups }}"
+    state: present
+    shell: /bin/bash       # Defaults to /bin/bash
+    system: no             # Defaults to no
+    createhome: yes        # Defaults to yes
+    home: "/home/{{ user_name }}"  # Defaults to /home/<username>
+
+- name: Configuring sudoer access
+  become: true
+  community.general.sudoers:
+    name: allow-all-sudo
+    state: present
+    user: "{{ user_name }}"
+    commands: ALL
+    nopassword: true
+
+- name: Setup user
+  become: true
+  become_user: "{{ user_name }}"
+  ansible.builtin.import_tasks: configure_user.yml

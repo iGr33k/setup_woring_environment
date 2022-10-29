@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+platforms:
+  - name: debian
+    box: debian/bullseye64
+  - name: ubuntu
+    box: ubuntu/kinetic64
+  - name: almalinux
+    box: almalinux/8
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8

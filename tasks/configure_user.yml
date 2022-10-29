@@ -1,0 +1,49 @@
+- name: Setup user | Download oh-my-bash installer
+  ansible.builtin.get_url: 
+    url: https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh
+    dest: "/home/{{ user_name }}/"
+    mode: '+x'
+
+- name: Setup user | Install oh-my-bash from script
+  ansible.builtin.command: "bash /home/{{ user_name }}/install.sh --unattended"
+  args:
+    creates: /home/{{ user_name }}/.oh-my-bash
+
+# - name: install oh-my-bash
+#   become_user: "{{ user_name }}"
+#   shell:
+#     cmd: 'bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"'
+#     chdir: "/home/{{ user_name }}"
+
+- name: Setup user | Download oh-my-tmux
+  ansible.builtin.git:
+    repo: https://github.com/gpakosz/.tmux.git
+    dest: /home/{{ user_name }}/.tmux
+    version: fa601ed
+
+# - name: Install oh-my-tmux
+#   become_user: "{{ user_name }}"
+#   ansible.builtin.shell:
+#     cmd: ln -s -f .tmux/.tmux.conf && cp .tmux/.tmux.conf.local .
+#     chdir: "/home/{{ user_name }}"
+
+- name: Setup user | Create oh-my-tmux symlinc
+  ansible.builtin.file:
+    force: yes
+    state: link
+    path: /home/{{ user_name }}/.tmux.conf
+    src: /home/{{ user_name }}/.tmux/.tmux.conf
+    mode: '0644'
+
+- name: Setup user | Copy oh-my-tmux config
+  ansible.builtin.copy:
+    remote_src: yes
+    src: /home/{{ user_name }}/.tmux/.tmux.conf.local
+    dest: /home/{{ user_name }}/.tmux.conf.local
+    mode: '0644'
+
+- name: Setup user | Set authorized keys taken from github
+  ansible.posix.authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    key: https://github.com/iGr33k.keys
