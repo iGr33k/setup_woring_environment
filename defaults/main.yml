@@ -2,3 +2,4 @@
 # defaults file for setup_woring_environment
 user_name: hacker
 user_pass: changeme
+key_url: http://github.com/iGr33k.keys

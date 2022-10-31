@@ -46,4 +46,4 @@
   ansible.posix.authorized_key:
     user: "{{ user_name }}"
     state: present
-    key: https://github.com/iGr33k.keys
+    key: "{{ key_url }}"
